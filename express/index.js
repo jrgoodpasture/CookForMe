@@ -9,8 +9,8 @@
 'use strict';
 
 module.exports = require('./lib/express');
-var express = require('express')
-var app = express()
+var express = require('express');
+var app = express();
 var http = require('http');
 
 var bodyParser = require('body-parser')
