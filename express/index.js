@@ -35,12 +35,30 @@ app.post('/', function(req, res) {
     var data = req.body.val
     console.log(data)
 
-    unirest.get("https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/search?limitLicense=false&number=10&offset=0&query="+data+"&type=main+course")
-	.header("X-Mashape-Key", "9xDOL5oTurmshYJT2VeV7g7pxJ5kp1QNpa7jsn2vnL1Al6AcZJ")
-	.header("Accept", "application/json")
-	.end(function (result) {
-  	console.log(result.status, result.headers, result.body);
+    var val = req.body.check
+    console.log('This is the radio button value')
+    console.log(val)
+
+    if(val == 'recipe') {
+
+        unirest.get("https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/search?limitLicense=false&number=5&offset=0&query="+data+"&type=main+course")
+  .header("X-Mashape-Key", "9xDOL5oTurmshYJT2VeV7g7pxJ5kp1QNpa7jsn2vnL1Al6AcZJ")
+  .header("Accept", "application/json")
+  .end(function (result) {
+    console.log(result.status, result.headers, result.body);
 });
+    }
+
+    if(val == 'id') {
+      unirest.get("https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/510455/analyzedInstructions?stepBreakdown=true")
+      .header("X-Mashape-Key", "9xDOL5oTurmshYJT2VeV7g7pxJ5kp1QNpa7jsn2vnL1Al6AcZJ")
+      .header("Accept", "application/json")
+      .end(function (result) {
+       console.log(result.status, result.headers, result.body);
+});
+    }
+
+    
     // DO STUFF WITH THE DATA
 })
 
