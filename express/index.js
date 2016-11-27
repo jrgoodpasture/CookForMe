@@ -45,16 +45,16 @@ app.post('/', function(req, res) {
   .header("X-Mashape-Key", "9xDOL5oTurmshYJT2VeV7g7pxJ5kp1QNpa7jsn2vnL1Al6AcZJ")
   .header("Accept", "application/json")
   .end(function (result) {
-    console.log(result.status, result.headers, result.body);
+    console.log( result.body);
 });
     }
 
     if(val == 'id') {
-      unirest.get("https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/510455/analyzedInstructions?stepBreakdown=true")
+      unirest.get("https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/"+data+"/analyzedInstructions?stepBreakdown=true")
       .header("X-Mashape-Key", "9xDOL5oTurmshYJT2VeV7g7pxJ5kp1QNpa7jsn2vnL1Al6AcZJ")
       .header("Accept", "application/json")
       .end(function (result) {
-       console.log(result.status, result.headers, result.body);
+       console.log( JSON.stringify(result.body));
 });
     }
 
