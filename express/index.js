@@ -54,7 +54,21 @@ app.post('/', function(req, res) {
       .header("X-Mashape-Key", "9xDOL5oTurmshYJT2VeV7g7pxJ5kp1QNpa7jsn2vnL1Al6AcZJ")
       .header("Accept", "application/json")
       .end(function (result) {
-       console.log( JSON.stringify(result.body));
+       //console.log( JSON.stringify(result.body));
+      for (var str in result.body) {
+        if (result.body.hasOwnProperty(str)) {
+          var val = result.body[str];
+          for (var s in val) {
+            var getKey = s;
+            var getVar = val[getKey];
+              for (var v in getVar) {
+                var getK = v;
+                var getV = getVar[v];
+                console.log(getV);
+              }
+          }
+        }
+        }
 });
     }
 
