@@ -1,0 +1,15 @@
+{
+  "intents": [
+    {
+      "intent": "Find",
+      "slots": [ {
+         "name": "ingredients",
+         "type": "INGREDIENT"
+      } ] 
+	},
+	{
+      "intent": "Help",
+      "slots": []
+    }
+  ]
+}
