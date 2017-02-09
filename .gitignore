@@ -1,2 +1,5 @@
 # Ignores node_modules folder
 node_modules
+
+# Ignores all other zip files
+*.zip
