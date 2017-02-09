@@ -10,3 +10,8 @@ Must do npm install unirest
 
 # Zipping
 Must zip with all lowercase naming
+
+# Setting Up Interaction Model
+Copy and paste contents of Intent_Schema.txt into Intent Schema
+Copy and paste contents of INGREDIENT.txt into custom slot values and name the slot INGREDIENT
+Copy and paste contents of Sample_Utterances.txt into Sample Utterances
