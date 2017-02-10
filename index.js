@@ -19,7 +19,9 @@ exports.handler = (event, context, callback) => {
                     var recipes = result.body.results;
                     var speechOutput = '';
                     if (recipes.length >= 0) {
-                        speechOutput = recipes[0].title;
+                        for (var i = 0; i < recipes.length && i < 5; i++) {
+                        	speechOutput += (" Number " + (i + 1) + " " + recipes[i].title + ".");
+                        }
                         output(speechOutput, context);
                     } else {
                         output("No recipes", context);
