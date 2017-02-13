@@ -20,7 +20,7 @@ exports.handler = (event, context, callback) => {
                     var speechOutput = '';
                     if (recipes.length >= 0) {
                         for (var i = 0; i < recipes.length && i < 5; i++) {
-                        	speechOutput += (" Number " + (i + 1) + " " + recipes[i].title + ".");
+                            speechOutput += (" Number " + (i + 1) + " " + recipes[i].title + ".");
                         }
                         output(speechOutput, context);
                     } else {
