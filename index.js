@@ -5,8 +5,7 @@ exports.handler = (event, context, callback) => {
     if (!done) {
         output("what would you like to cook today?", context);
         done = true;
-    }
-     else {
+    } else {
         var utter = event.request.intent.slots.ingredients.value;
         // output("Finding Recipes for " + utter, context);
 
