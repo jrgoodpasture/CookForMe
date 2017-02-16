@@ -15,13 +15,11 @@ var handlers = {
 
     'Find': function () {
 
-        var ingredient = this.event.request.intent.slots.ingredients.value;
+    	var current = this;
+
+        var ingredient = current.event.request.intent.slots.ingredients.value;
 
         var url = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/search?limitLicense=false&number=5&offset=0&query=" + ingredient + "&type=main+course";       
-
-        this.emit('Calling', this, url);
-    },
-    'Calling': function(that, url) {
 
         console.log("***** Find ***** " + url);
         
@@ -45,7 +43,7 @@ var handlers = {
                         speechOutput = "No recipes found";
                     }
                     console.log(speechOutput);
-                    that.emit(':tell', speechOutput);
+                    current.emit(':tell', speechOutput);
                 });
     }
 };
