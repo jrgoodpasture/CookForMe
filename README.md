@@ -1,6 +1,9 @@
 # CookForMe
 Amazon Alexa Skill for our Junior Design Project
 
+# Contributors
+Min Jung, Min Ho Lee, Jacob Goodpasture, Rohan Avalani, Seth Davis
+
 # Node Version
 Lambda function needs 4.3 and above
 
