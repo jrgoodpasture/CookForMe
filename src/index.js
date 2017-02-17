@@ -44,16 +44,17 @@ var handlers = {
                         speechOutput = "No recipes found";
                     }
                     console.log(speechOutput);
-                    current.emit(':tell', speechOutput);
+                    current.emit(':ask', speechOutput);
                 });
     },
+
 	'GetInstruction': function() {
 		var current = this;
-		var name = current.event.request.intent.slots.food.value;
-		console.log("*************" + name);
+		var name = current.event.request.intent.slots.ingredients.value.split(" ").join("+");
+		console.log("***" + name + "********************");
 
     	var key = "9xDOL5oTurmshYJT2VeV7g7pxJ5kp1QNpa7jsn2vnL1Al6AcZJ";
-    	var url = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/search?limitLicense=false&number=1&offset=0&query=" + name + "&type=main+course";
+    	var url = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/autocomplete?number=1&query=" + name;
     	// //Getting the recipe id
     	unirest.get(url)
                 .header("X-Mashape-Key", "9xDOL5oTurmshYJT2VeV7g7pxJ5kp1QNpa7jsn2vnL1Al6AcZJ")
@@ -61,11 +62,13 @@ var handlers = {
                 .end(function (result) {
                     console.log(result.status, result.headers, result.body);
                           
-                    var recipes = result.body.results;
+                    var recipes = result.body;
                     var id = 0;
                                         
-                    if (result.body.totalResults > 0) {
-                    	id = recipes[0].id;
+                    if (result.body.length > 0) {
+                    	id = recipes[0]	.id;
+
+                    	console.log("*************************" + id);
 
 						var url = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/" + id + "/analyzedInstructions?stepBreakdown=true";
                     	unirest.get(url)
@@ -95,6 +98,7 @@ var handlers = {
                     }
                 });
     },
+
     'Unhandled': function () {
 		var message = "What would you like to cook today?";
 		this.emit(':ask', message);
