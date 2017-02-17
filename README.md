@@ -14,7 +14,11 @@ Copy and paste contents of INGREDIENT.txt into custom slot values and name the s
 Copy and paste contents of Sample_Utterances.txt into Sample Utterances
 
 # Pushing to AWS
-# Using shell script:
+Using shell script:
+```
 ./publish.sh
-# Using batch file:
+```
+Using batch file:
+```
 publish
+```
