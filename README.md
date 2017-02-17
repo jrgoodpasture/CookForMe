@@ -21,7 +21,7 @@ Copy and paste contents of Intent_Schema.txt into Intent Schema
 Copy and paste contents of INGREDIENT.txt into custom slot values and name the slot INGREDIENT
 Copy and paste contents of Sample_Utterances.txt into Sample Utterances
 
-# Pushing to AWS
+## Pushing to AWS
 Using shell script:
 ```
 ./publish.sh
