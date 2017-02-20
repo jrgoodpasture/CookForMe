@@ -6,10 +6,16 @@
          "name": "ingredients",
          "type": "INGREDIENT"
       } ] 
-	},
+    },
 	{
-      "intent": "Help",
-      "slots": []
+      "intent": "Best"
+    },
+    {
+      "intent": "GetInstruction",
+      "slots": [ {
+         "name": "ingredients",
+         "type": "INGREDIENT"
+      } ] 
     }
   ]
 }
