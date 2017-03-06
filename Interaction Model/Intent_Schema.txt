@@ -6,10 +6,26 @@
          "name": "ingredients",
          "type": "INGREDIENT"
       } ] 
-	},
-	{
-      "intent": "Help",
-      "slots": []
+    },
+    {
+      "intent": "Unhandled",
+      "slots": [ {
+         "name": "ingredients",
+         "type": "INGREDIENT"
+      } ]
+    },
+    {
+      "intent": "GetInstruction",
+      "slots": [ {
+         "name": "ingredients",
+         "type": "INGREDIENT"
+      } ] 
+    },
+    {
+      "intent": "AMAZON.StopIntent"
+    },
+    {
+      "intent": "AMAZON.HelpIntent"
     }
   ]
 }

@@ -1,2 +1,6 @@
 Find find me recipes for {ingredients}
-Help help
+Find find recipes for {ingredients}
+GetInstruction get me instructions for {ingredients}
+GetInstruction get instructions for {ingredients}
+GetInstruction find me instructions for {ingredients}
+Unhandled {ingredients}

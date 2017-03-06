@@ -1,4 +1,4 @@
-del cookforme.zip
+del /f cookforme.zip
 cd src
 7z a -r ..\cookforme.zip *
 cd ..
