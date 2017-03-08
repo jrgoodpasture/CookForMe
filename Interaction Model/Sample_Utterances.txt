@@ -3,4 +3,6 @@ Find find recipes for {ingredients}
 GetInstruction get me instructions for {ingredients}
 GetInstruction get instructions for {ingredients}
 GetInstruction find me instructions for {ingredients}
+GetInstructionStepByStep get me instructions step by step for {ingredients}
+RepeatStep repeat
 Unhandled {ingredients}

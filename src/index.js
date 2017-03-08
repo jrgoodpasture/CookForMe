@@ -1,10 +1,11 @@
-
 'use strict';
 var Alexa = require("alexa-sdk");
 var unirest = require("unirest");
 var appId = 'amzn1.ask.skill.4233738b-7e2a-4fa6-888e-70c9fcd89686';
 
 var prevState = '';
+var instructionSteps = [];
+var currentStep = 0;
 
 exports.handler = function(event, context, callback) {
     var alexa = Alexa.handler(event, context);
@@ -75,7 +76,7 @@ var handlers = {
                     var id = 0;
                                         
                     if (result.body.length > 0) {
-                        id = recipes[0] .id;
+                        id = recipes[0].id;
 
                         var url = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/" + id + "/analyzedInstructions?stepBreakdown=true";
                         unirest.get(url)
@@ -106,11 +107,99 @@ var handlers = {
                 });
     },
 
-    'AMAZON.StopIntent': function () {
+    'GetInstructionStepByStep': function() {
+
+        prevState = 'GetInstructionStepByStep';
+
+        var current = this;
+        var name = current.event.request.intent.slots.ingredients.value.split(" ").join("+");
+
+        var key = "9xDOL5oTurmshYJT2VeV7g7pxJ5kp1QNpa7jsn2vnL1Al6AcZJ";
+        var url = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/autocomplete?number=1&query=" + name;
+        
+        // //Getting the recipe id
+        
+        unirest.get(url)
+                .header("X-Mashape-Key", "9xDOL5oTurmshYJT2VeV7g7pxJ5kp1QNpa7jsn2vnL1Al6AcZJ")
+                .header("Accept", "application/json")
+                .end(function (result) {
+                    console.log(result.status, result.headers, result.body);
+                          
+                    var recipes = result.body;
+                    var id = 0;
+                                        
+                    if (result.body.length > 0) {
+                        id = recipes[0].id;
+
+                        var url = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/" + id + "/analyzedInstructions?stepBreakdown=true";
+                        unirest.get(url)
+                                .header("X-Mashape-Key", "9xDOL5oTurmshYJT2VeV7g7pxJ5kp1QNpa7jsn2vnL1Al6AcZJ")
+                                .header("Accept", "application/json")
+                                .end(function (result) {
+                                    console.log(result.status, result.headers, result.body);
+                                    if (result.body.length > 0) {
+                                        var instruction = result.body[0].steps;
+
+                                        var speechOutput = '';
+
+                                        for (var i = 0; i < instruction.length; i++) {
+                                            instructionSteps[i] = instruction[i].step;
+                                        }
+
+                                        currentStep = 1;
+
+                                        current.emit('SayStep', currentStep);
+
+                                    } else {
+                                        current.emit(':ask', "I could not find the recipe.", "What else would you like to cook today?");
+                                    }
+                                });
+
+                    } else {
+                        current.emit(':ask', "Could not find the recipe.", "What else would you like to cook today?");
+                    }
+                });
+    },
+
+    'SayStep': function(stepNumber) {
+    	var current = this;
+        if (stepNumber < instructionSteps.length && stepNumber > 0) {
+            var message = "Step " + stepNumber + ": " + instructionSteps[stepNumber - 1] + ". ";
+            message += "Would you like to continue?";
+            current.emit(':ask', message);
+        } else {
+        	current.emit(':tell', "Could not get this step.");
+        }
+    },
+
+    'AMAZON.YesIntent': function() {
+    	var current = this;
+    	if (prevState == 'GetInstructionStepByStep') {
+    		currentStep += 1;
+    		current.emit('SayStep', currentStep);
+    	} else {
+    		current.emit('Unhandled');
+    	}
+    },
+
+    'AMAZON.NoIntent': function() {
+        this.emit('Stop');
+    },
+
+    'RepeatStep': function() {
+    	var current = this;
+    	if (prevState == 'GetInstructionStepByStep') {
+    		current.emit('SayStep', currentStep);
+    	} else {
+    		current.emit('Unhandled');
+    	}
+    },
+
+    'AMAZON.StopIntent': function() {
         this.emit(':tell', "See you next time!");
     },
 
-    'AMAZON.HelpIntent': function () {
+    'AMAZON.HelpIntent': function() {
         var message = "You can ask me to find a recipe by saying, find me recipes for ... burgers. "
         message += "Or you can ask me to get instructions for a recipe by saying, get me instructions for ... taco burger."
         this.emit(':ask', message);
