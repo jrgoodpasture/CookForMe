@@ -1,11 +1,14 @@
 'use strict';
 var Alexa = require("alexa-sdk");
 var unirest = require("unirest");
+var mysql = require("mysql");
 var appId = 'amzn1.ask.skill.4233738b-7e2a-4fa6-888e-70c9fcd89686';
 
 var prevState = '';
 var instructionSteps = [];
 var currentStep = 0;
+var recipeName = '';
+var continued = false;
 
 exports.handler = function(event, context, callback) {
     var alexa = Alexa.handler(event, context);
@@ -20,6 +23,60 @@ var handlers = {
         prevState = 'LaunchRequest';
         var message = 'What would you like to cook today?';
         this.emit(':ask', message);
+    },
+
+    'Continue': function() {
+        continued = true;
+        console.log("Continuing ****************");
+        this.emit('GetFromDatabase');
+    },
+
+    'GetFromDatabase': function() {
+
+        var userid = this.event.session.user.userId;
+
+        var current = this;
+
+        console.log("****************before haywiring shit");
+
+        var sqlinfo = {
+                host     : 'cookformedb.ci5n0kf1z0rv.us-east-1.rds.amazonaws.com',
+                user     : 'cookforme',
+                password : 'Soundify2017',
+                port     : '3306',
+                database : 'cookformedb'
+            }
+
+        var connection = mysql.createConnection(sqlinfo);
+
+        console.log("***********DOING SHIT");
+
+        connection.connect();
+
+        var queryString = "SELECT * FROM USER_HISTORY WHERE User_ID = \'" + userid + "\'";
+
+        connection.query(queryString, function(err, rows, fields) {
+            if (err) {
+                throw err;
+            }
+
+            prevState = rows[0].intent;
+            recipeName = rows[0].recipe;
+            currentStep = rows[0].stepNum;
+
+            console.log(prevState);
+
+            connection.end(function() {
+                if (prevState == 'GetInstruction') {
+                    current.emit('GetInstruction');
+                } else if (prevState == 'GetInstructions') {
+                    current.emit('GetInstructionStepByStep');
+                } else {
+                    current.emit(':tell', "failed");
+                }
+                // current.emit(':tell', 'failed');
+            });
+        })
     },
 
     'Find': function() {
@@ -112,7 +169,14 @@ var handlers = {
         prevState = 'GetInstructionStepByStep';
 
         var current = this;
-        var name = current.event.request.intent.slots.ingredients.value.split(" ").join("+");
+
+        var name = '';
+
+        if (!continued) { 
+            name = current.event.request.intent.slots.ingredients.value.split(" ").join("+");
+        } else {
+            name = recipeName;
+        }
 
         var key = "9xDOL5oTurmshYJT2VeV7g7pxJ5kp1QNpa7jsn2vnL1Al6AcZJ";
         var url = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/autocomplete?number=1&query=" + name;
@@ -145,8 +209,9 @@ var handlers = {
                                         for (var i = 0; i < instruction.length; i++) {
                                             instructionSteps[i] = instruction[i].step;
                                         }
-
-                                        currentStep = 1;
+                                        if (!continued) {
+                                            currentStep = 1;
+                                        }
 
                                         current.emit('SayStep', currentStep);
 
