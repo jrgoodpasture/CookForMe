@@ -27,7 +27,6 @@ var handlers = {
 
     'Continue': function() {
         continued = true;
-        console.log("Continuing ****************");
         this.emit('GetFromDatabase');
     },
 
@@ -37,7 +36,6 @@ var handlers = {
 
         var current = this;
 
-        console.log("****************before haywiring shit");
 
         var sqlinfo = {
                 host     : 'cookformedb.ci5n0kf1z0rv.us-east-1.rds.amazonaws.com',
@@ -48,8 +46,6 @@ var handlers = {
             }
 
         var connection = mysql.createConnection(sqlinfo);
-
-        console.log("***********DOING SHIT");
 
         connection.connect();
 
