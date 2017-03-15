@@ -1,6 +1,5 @@
 # Ignores node_modules folder
 node_modules
-package.json
 
 # Ignores all other zip files
 *.zip
