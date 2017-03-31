@@ -237,11 +237,13 @@ var handlers = {
             var speechOutput = "";
             for (var i = 0; i < instructionSteps.length; i++) {
                 speechOutput += (" Step " + (i + 1) + ": " + instructionSteps[i].split(ing[0]).join(ing[1]) + ".");
+                instructionSteps[i] = instructionSteps[i].split(ing[0]).join(ing[1]);
             }
 
+            console.log(instructionSteps);
             speechOutput = speechOutput.replace("(PRINTABLE)", "");
             
-            current.emit(':tell', speechOutput);
+            current.emit('SayStep', 1);
         } else {
             current.emit(':tell', "The " + ing[0] + " does not exist in the recipe")
         }
