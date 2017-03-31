@@ -2,10 +2,11 @@
 var Alexa = require("alexa-sdk");
 var unirest = require("unirest");
 var mysql = require("mysql");
-var appId = 'amzn1.ask.skill.4233738b-7e2a-4fa6-888e-70c9fcd89686';
+var appId = 'amzn1.ask.skill.f0bf9c75-0eb5-4375-b3ed-792685fae414';
 
 var prevState = '';
 var instructionSteps = [];
+var ingredientsArr = [];
 var currentStep = 0;
 var recipeName = '';
 var continued = false;
@@ -201,9 +202,12 @@ var handlers = {
                                         var instruction = result.body[0].steps;
 
                                         var speechOutput = '';
-
+                                        var counter = 0;
                                         for (var i = 0; i < instruction.length; i++) {
                                             instructionSteps[i] = instruction[i].step;
+                                            for (var j = 0; j < instruction[i].ingredients.length; j++) {
+                                                 ingredientsArr[counter++] = instruction[i].ingredients[j].name;
+                                            }     
                                         }
                                         if (!continued) {
                                             currentStep = 1;
@@ -222,25 +226,46 @@ var handlers = {
                 });
     },
 
+    'ModifyRecipe': function() {
+        var current = this;
+        console.log(current.event.request.intent.slots.ingredients.value);
+        var ing = current.event.request.intent.slots.ingredients.value.split(" to ");
+        var idx = ingredientsArr.indexOf(ing[0]);
+        console.log(ing[0], ing[1], idx);
+        console.log(ingredientsArr);
+        if (idx > -1) {
+            var speechOutput = "";
+            for (var i = 0; i < instructionSteps.length; i++) {
+                speechOutput += (" Step " + (i + 1) + ": " + instructionSteps[i].split(ing[0]).join(ing[1]) + ".");
+            }
+
+            speechOutput = speechOutput.replace("(PRINTABLE)", "");
+            
+            current.emit(':tell', speechOutput);
+        } else {
+            current.emit(':tell', "The " + ing[0] + " does not exist in the recipe")
+        }
+    },
+
     'SayStep': function(stepNumber) {
-    	var current = this;
+        var current = this;
         if (stepNumber < instructionSteps.length && stepNumber > 0) {
             var message = "Step " + stepNumber + ": " + instructionSteps[stepNumber - 1] + ". ";
             message += "Would you like to continue?";
             current.emit(':ask', message);
         } else {
-        	current.emit(':tell', "Could not get this step.");
+            current.emit(':tell', "Could not get this step.");
         }
     },
 
     'AMAZON.YesIntent': function() {
-    	var current = this;
-    	if (prevState == 'GetInstructionStepByStep') {
-    		currentStep += 1;
-    		current.emit('SayStep', currentStep);
-    	} else {
-    		current.emit('Unhandled');
-    	}
+        var current = this;
+        if (prevState == 'GetInstructionStepByStep') {
+            currentStep += 1;
+            current.emit('SayStep', currentStep);
+        } else {
+            current.emit('Unhandled');
+        }
     },
 
     'AMAZON.NoIntent': function() {
@@ -248,12 +273,12 @@ var handlers = {
     },
 
     'RepeatStep': function() {
-    	var current = this;
-    	if (prevState == 'GetInstructionStepByStep') {
-    		current.emit('SayStep', currentStep);
-    	} else {
-    		current.emit('Unhandled');
-    	}
+        var current = this;
+        if (prevState == 'GetInstructionStepByStep') {
+            current.emit('SayStep', currentStep);
+        } else {
+            current.emit('Unhandled');
+        }
     },
 
     'AMAZON.StopIntent': function() {
