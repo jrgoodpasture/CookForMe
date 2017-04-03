@@ -43,6 +43,15 @@
             ]
         },
         {
+        	"intent": "ModifyRecipe",
+	    	"slots": [
+	        	{
+	        		"name": "ingredients",
+	        		"type": "INGREDIENT"
+	        	}
+	      	]
+	    },
+        {
             "intent": "RepeatStep"
         },
         {

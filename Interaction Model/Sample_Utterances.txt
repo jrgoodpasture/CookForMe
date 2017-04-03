@@ -7,4 +7,5 @@ GetInstructionStepByStep get me instructions step by step for {ingredients}
 RepeatStep repeat
 GetFromDatabase get from database
 Continue continue
+ModifyRecipe change {ingredients}
 Unhandled {ingredients}

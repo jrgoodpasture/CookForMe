@@ -1,5 +1,5 @@
 # CookForMe
-Amazon Alexa Skill for our Junior Design Project
+Amazon Alexa Skill for our Junior Design Project to aid in cooking
 
 ## Contributors
 Min Jung, Min Ho Lee, Jacob Goodpasture, Rohan Avalani, Seth Davis
@@ -8,13 +8,11 @@ Min Jung, Min Ho Lee, Jacob Goodpasture, Rohan Avalani, Seth Davis
 Lambda function needs 4.3 and above
 
 ## Dependencies
-Must do:
+Must do inside /src to install dependencies:
 ```
-npm init
-npm install --save unirest
-npm install --save alexa-sdk
+npm install
 ```
-
+This will create a /node_module directory inside /src for the dependencies 
 
 ## Setting Up Interaction Model
 Copy and paste contents of Intent_Schema.txt into Intent Schema

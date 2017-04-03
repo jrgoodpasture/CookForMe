@@ -1,15 +1,20 @@
 {
   "name": "cookforme",
   "version": "1.0.0",
-  "description": "",
+  "description": "Alexa Skill to aid in cooking",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Use publish for Windows and ./publish.sh for Unix\" && exit 1"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jrgoodpasture"
+  },
+  "author": "Soundify",
   "license": "ISC",
   "dependencies": {
     "alexa-sdk": "^1.0.7",
+    "mysql": "^2.13.0",
     "unirest": "^0.5.1"
   }
 }

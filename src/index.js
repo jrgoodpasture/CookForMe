@@ -2,7 +2,7 @@
 var Alexa = require("alexa-sdk");
 var unirest = require("unirest");
 var mysql = require("mysql");
-var appId = 'amzn1.ask.skill.4233738b-7e2a-4fa6-888e-70c9fcd896864';
+var appId = 'amzn1.ask.skill.4233738b-7e2a-4fa6-888e-70c9fcd89686';
 
 var prevState = '';
 var instructionSteps = [];
