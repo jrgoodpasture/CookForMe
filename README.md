@@ -19,6 +19,9 @@ Copy and paste contents of Intent_Schema.txt into Intent Schema
 Copy and paste contents of INGREDIENT.txt into custom slot values and name the slot INGREDIENT
 Copy and paste contents of Sample_Utterances.txt into Sample Utterances
 
+## Setting Up Skill
+Must use own application ID and copy it into index.js
+
 ## Pushing to AWS
 Using shell script:
 ```
@@ -28,3 +31,4 @@ Using batch file:
 ```
 publish
 ```
+Must have AWS CLI setup and must edit script to publish to correct lambda function
