@@ -2,7 +2,7 @@
 var Alexa = require("alexa-sdk");
 var unirest = require("unirest");
 var mysql = require("mysql");
-var appId = 'amzn1.ask.skill.4233738b-7e2a-4fa6-888e-70c9fcd89686';
+var appId = 'amzn1.ask.skill.754eb63a-1172-440b-a711-8bd1a23d0c2f';
 
 var prevState = '';
 var instructionSteps = [];
@@ -10,6 +10,16 @@ var ingredientsArr = [];
 var currentStep = 0;
 var recipeName = '';
 var continued = false;
+var saved = false;
+var userid = '';
+var sqlinfo = {
+                host     : 'cookformedb.ci5n0kf1z0rv.us-east-1.rds.amazonaws.com',
+                user     : 'cookforme',
+                password : 'Soundify2017',
+                port     : '3306',
+                database : 'cookformedb'
+            }
+var connection;
 
 exports.handler = function(event, context, callback) {
     var alexa = Alexa.handler(event, context);
@@ -34,46 +44,50 @@ var handlers = {
     'GetFromDatabase': function() {
 
         var userid = this.event.session.user.userId;
-
         var current = this;
+		connectToDB();
 
+        if(!connection){
+			console.log("DB not connected");
+    	}
 
-        var sqlinfo = {
-                host     : 'cookformedb.ci5n0kf1z0rv.us-east-1.rds.amazonaws.com',
-                user     : 'cookforme',
-                password : 'Soundify2017',
-                port     : '3306',
-                database : 'cookformedb'
-            }
+    	var queryString = "INSERT INTO USER_HISTORY VALUES " + "(\'" + userid + "\', \'" + prevState + "\', \'" + recipeName + "\', " + currentStep + ")" +
+        " ON DUPLICATE KEY UPDATE intent =\'" + prevState + "\', recipe= \'" + recipeName + "\', stepNum = " + currentStep;
 
-        var connection = mysql.createConnection(sqlinfo);
+        if (continued)
+        	queryString = "SELECT * FROM USER_HISTORY WHERE User_ID = \'" + userid + "\'";
 
-        connection.connect();
-
-        var queryString = "SELECT * FROM USER_HISTORY WHERE User_ID = \'" + userid + "\'";
-
+        console.log(queryString);
         connection.query(queryString, function(err, rows, fields) {
             if (err) {
                 throw err;
             }
+            if (continued) {
+            	//console.log("Continuing");
+	            prevState = rows[0].intent;
+	            recipeName = rows[0].recipe;
+	            currentStep = rows[0].stepNum;
+        	}
 
-            prevState = rows[0].intent;
-            recipeName = rows[0].recipe;
-            currentStep = rows[0].stepNum;
+            console.log("State: " + prevState + "name: " + recipeName + "currentStep: " + currentStep);
 
-            console.log(prevState);
-
-            connection.end(function() {
-                if (prevState == 'GetInstruction') {
-                    current.emit('GetInstruction');
-                } else if (prevState == 'GetInstructions') {
-                    current.emit('GetInstructionStepByStep');
-                } else {
-                    current.emit(':tell', "failed");
-                }
+            //connection.end(function() {
+            	if (continued) {
+            		continued = false;
+	                if (prevState == 'GetInstruction') {
+	                    current.emit('GetInstruction');
+	                } else if (prevState == 'GetInstructionStepByStep') {
+	                    current.emit('GetInstructionStepByStep');
+	                } else {
+	                    current.emit(':tell', "failed");
+	                }
+	            } else {
+	            	saved = true;
+	            	current.emit('SayStep');
+	            }
                 // current.emit(':tell', 'failed');
-            });
-        })
+           // });
+        });
     },
 
     'Find': function() {
@@ -164,16 +178,34 @@ var handlers = {
     'GetInstructionStepByStep': function() {
 
         prevState = 'GetInstructionStepByStep';
+        console.log("current:  " + current);
 
         var current = this;
 
         var name = '';
 
-        if (!continued) { 
-            name = current.event.request.intent.slots.ingredients.value.split(" ").join("+");
-        } else {
-            name = recipeName;
+        var sqlinfo = {
+                host     : 'cookformedb.ci5n0kf1z0rv.us-east-1.rds.amazonaws.com',
+                user     : 'cookforme',
+                password : 'Soundify2017',
+                port     : '3306',
+                database : 'cookformedb'
+            }
+
+		connectToDB();
+		// If the recipe name does not exist, it is set equal to what was said
+		// The else if checks if something exists in the request slot and then sees if recipeName is equal to it
+        if (!recipeName) {
+        	//console.log("Test1");
+            recipeName = current.event.request.intent.slots.ingredients.value;   
+        } else if (current.event.request.intent.slots != undefined && recipeName && recipeName != current.event.request.intent.slots.ingredients.value) {
+            //console.log("Test2");
+        	recipeName = current.event.request.intent.slots.ingredients.value;
+        	currentStep = 1;
         }
+        console.log("Recipe name: " + recipeName);
+
+        name = recipeName.split(" ").join("+");
 
         var key = "9xDOL5oTurmshYJT2VeV7g7pxJ5kp1QNpa7jsn2vnL1Al6AcZJ";
         var url = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/autocomplete?number=1&query=" + name;
@@ -200,16 +232,16 @@ var handlers = {
                                     console.log(result.status, result.headers, result.body);
                                     if (result.body.length > 0) {
                                         var instruction = result.body[0].steps;
-
                                         var speechOutput = '';
                                         var counter = 0;
+
                                         for (var i = 0; i < instruction.length; i++) {
                                             instructionSteps[i] = instruction[i].step;
-                                            for (var j = 0; j < instruction[i].ingredients.length; j++) {
+                                             for (var j = 0; j < instruction[i].ingredients.length; j++) {
                                                  ingredientsArr[counter++] = instruction[i].ingredients[j].name;
-                                            }     
+                                            } 
                                         }
-                                        if (!continued) {
+                                        if (!currentStep) {
                                             currentStep = 1;
                                         }
 
@@ -250,24 +282,32 @@ var handlers = {
     },
 
     'SayStep': function(stepNumber) {
-        var current = this;
+    	var current = this;
+        userid = current.event.session.user.userId;
         if (stepNumber < instructionSteps.length && stepNumber > 0) {
             var message = "Step " + stepNumber + ": " + instructionSteps[stepNumber - 1] + ". ";
             message += "Would you like to continue?";
+            //saveState();
+            if (!saved) {
+            	console.log("Not saved... saving")
+            	current.emit('GetFromDatabase');
+            }
+            saved = !saved;
             current.emit(':ask', message);
         } else {
-            current.emit(':tell', "Could not get this step.");
+        	console.log("Step Num: " + stepNumber + "   Steps Length: " + instructionSteps.Length);
+        	current.emit(':tell', "Could not get this step.");
         }
     },
 
     'AMAZON.YesIntent': function() {
-        var current = this;
-        if (prevState == 'GetInstructionStepByStep') {
-            currentStep += 1;
-            current.emit('SayStep', currentStep);
-        } else {
-            current.emit('Unhandled');
-        }
+    	var current = this;
+    	if (prevState == 'GetInstructionStepByStep') {
+    		currentStep += 1;
+    		current.emit('SayStep', currentStep);
+    	} else {
+    		current.emit('Unhandled');
+    	}
     },
 
     'AMAZON.NoIntent': function() {
@@ -275,12 +315,12 @@ var handlers = {
     },
 
     'RepeatStep': function() {
-        var current = this;
-        if (prevState == 'GetInstructionStepByStep') {
-            current.emit('SayStep', currentStep);
-        } else {
-            current.emit('Unhandled');
-        }
+    	var current = this;
+    	if (prevState == 'GetInstructionStepByStep') {
+    		current.emit('SayStep', currentStep);
+    	} else {
+    		current.emit('Unhandled');
+    	}
     },
 
     'AMAZON.StopIntent': function() {
@@ -298,3 +338,49 @@ var handlers = {
         this.emit(':ask', message);
     }
 };
+
+function saveState() {
+
+    var sqlinfo = {
+            host     : 'cookformedb.ci5n0kf1z0rv.us-east-1.rds.amazonaws.com',
+            user     : 'cookforme',
+            password : 'Soundify2017',
+            port     : '3306',
+            database : 'cookformedb'
+        }
+
+    var connection = mysql.createConnection(sqlinfo);
+    connection.connect(function(err){
+		if(err){
+		    console.log('Error connecting to Db');
+		    return;
+		}
+		console.log('Connection established');
+	});
+
+    var queryString = "INSERT INTO USER_HISTORY VALUES " + "(\'" + userid + "\', \'" + prevState + "\', \'" + recipeName + "\', " + currentStep + ")" +
+        " ON DUPLICATE KEY UPDATE intent =\'" + prevState + "\', recipe= \'" + recipeName + "\', stepNum = " + currentStep;
+
+    console.log(queryString);
+
+    connection.query(queryString, function(err, rows, fields) {
+        if (err) {
+            throw err;
+        }
+        connection.end();
+    });
+}
+
+function connectToDB() {
+	if (!connection) {
+		connection = mysql.createConnection(sqlinfo);
+	    connection.connect(function(err) {
+			if (err) {
+				console.log('error connecting: ' + err.stack);
+			} else {
+				console.log('DB connection successful!');
+			}
+		});
+	}
+
+}
