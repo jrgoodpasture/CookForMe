@@ -265,14 +265,19 @@ var handlers = {
         var idx = ingredientsArr.indexOf(ing[0]);
         console.log(ing[0], ing[1], idx);
         console.log(ingredientsArr);
+        var modified = "{\"name\":\"\", \"steps\": ["; 
         if (idx > -1) {
             var speechOutput = "";
             for (var i = 0; i < instructionSteps.length; i++) {
                 speechOutput += (" Step " + (i + 1) + ": " + instructionSteps[i].split(ing[0]).join(ing[1]) + ".");
+                modified += "{\"number\":" + (i + 1) + ", \"step\":" + instructionSteps[i].split(ing[0]).join(ing[1]) 
+                    + ", \"ingredients\":[], \"equipment\":[]},";
                 instructionSteps[i] = instructionSteps[i].split(ing[0]).join(ing[1]);
             }
-
-            console.log(instructionSteps);
+            modified = modified.substring(0, modified.length-1);
+            modified += "]}";
+            console.log(modified);
+            var json = JSON.stringify(eval("(" + modified + ")"));
             speechOutput = speechOutput.replace("(PRINTABLE)", "");
             
             current.emit('SayStep', 1);
