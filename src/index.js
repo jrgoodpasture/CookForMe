@@ -275,6 +275,7 @@ var handlers = {
                 instructionSteps[i] = instructionSteps[i].split(ing[0]).join(ing[1]);
             }
             modified = modified.substring(0, modified.length-1);
+            modified = modified.replace("(PRINTABLE)", "");
             modified += "]}";
             console.log(modified);
             var json = JSON.stringify(eval("(" + modified + ")"));
