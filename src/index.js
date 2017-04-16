@@ -176,21 +176,14 @@ var handlers = {
     },
 
     'GetInstructionStepByStep': function() {
-
         prevState = 'GetInstructionStepByStep';
         console.log("current:  " + current);
 
         var current = this;
+        userid = current.event.session.user.userId;
+
 
         var name = '';
-
-        var sqlinfo = {
-                host     : 'cookformedb.ci5n0kf1z0rv.us-east-1.rds.amazonaws.com',
-                user     : 'cookforme',
-                password : 'Soundify2017',
-                port     : '3306',
-                database : 'cookformedb'
-            }
 
 		connectToDB();
 		// If the recipe name does not exist, it is set equal to what was said
@@ -211,51 +204,96 @@ var handlers = {
         var url = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/autocomplete?number=1&query=" + name;
         
         // //Getting the recipe id
+
+        var queryString = "SELECT * FROM MODIFIED_RECIPES WHERE User_ID = '" + userid + "' AND recipe = '" + recipeName + "'";
+        console.log(queryString);
+        connection.query(queryString, function(err, rows, fields) {
+		        if (err) {
+		            throw err;
+		        } else {
+	            	if (rows[0]) {
+	            		console.log("Found modified recipe");
+		            	var modified_recipe = rows[0].modified_recipe;
+		            	console.log(modified_recipe);
+		            	//Changing string in JSON format to an actual JSON object
+		            	//modified_recipe = '{"Test1" : 1}';
+		            	var jsonRecipe = JSON.parse(modified_recipe);
+		            	//jsonRecipe = JSON.stringify(jsonRecipe);
+		            	console.log("jsonRecipe type: " + typeof jsonRecipe);
+		            // 	console.log("Steps 0: " + JSON.stringify(jsonRecipe.steps[0].step));
+		          		// console.log("Steps 1: " + JSON.stringify(jsonRecipe.steps[1].step));
+		            	if (jsonRecipe.steps.length > 0) {
+							var instruction = jsonRecipe.steps;
+                            var speechOutput = '';
+                            var counter = 0;
+                            console.log("iLength: " + instruction.length);
+                            for (var i = 0; i < instruction.length; i++) {
+                                instructionSteps[i] = JSON.stringify(instruction[i].step);
+                                console.log("Step " + i + " :" + instructionSteps[i]);
+                                //  for (var j = 0; j < instruction[i].ingredients.length; j++) {
+                                //      ingredientsArr[counter++] = instruction[i].ingredients[j].name;
+                                // } 
+                            }
+                            if (!currentStep) {
+                                currentStep = 1;
+                            }
+		            	}
+
+		            	current.emit('SayStep', currentStep);
+		            	//current.emit(':tell', "Recipe name:" + JSON.stringify(jsonRecipe.steps[0].step));
+		            } else {
+		            	console.log("No modified recipe found");
+		            	unirest.get(url)
+			                .header("X-Mashape-Key", "9xDOL5oTurmshYJT2VeV7g7pxJ5kp1QNpa7jsn2vnL1Al6AcZJ")
+			                .header("Accept", "application/json")
+			                .end(function (result) {
+			                    console.log(result.status, result.headers, result.body);
+			                          
+			                    var recipes = result.body;
+			                    var id = 0;
+			                                        
+			                    if (result.body.length > 0) {
+			                        id = recipes[0].id;
+
+			                        var url = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/" + id + "/analyzedInstructions?stepBreakdown=true";
+			                        unirest.get(url)
+			                                .header("X-Mashape-Key", "9xDOL5oTurmshYJT2VeV7g7pxJ5kp1QNpa7jsn2vnL1Al6AcZJ")
+			                                .header("Accept", "application/json")
+			                                .end(function (result) {
+			                                    console.log(result.status, result.headers, result.body);
+			                                    if (result.body.length > 0) {
+			                                        var instruction = result.body[0].steps;
+			                                        var speechOutput = '';
+			                                        var counter = 0;
+
+			                                        for (var i = 0; i < instruction.length; i++) {
+			                                            instructionSteps[i] = instruction[i].step;
+			                                             for (var j = 0; j < instruction[i].ingredients.length; j++) {
+			                                                 ingredientsArr[counter++] = instruction[i].ingredients[j].name;
+			                                            } 
+			                                        }
+			                                        if (!currentStep) {
+			                                            currentStep = 1;
+			                                        }
+
+			                                        current.emit('SayStep', currentStep);
+
+			                                    } else {
+			                                        current.emit(':ask', "I could not find the recipe.", "What else would you like to cook today?");
+			                                    }
+			                                });
+
+			                    } else {
+			                        current.emit(':ask', "Could not find the recipe.", "What else would you like to cook today?");
+			                    }
+			                });
+
+		            }
+	            	//parse through json text
+            	}
+	        });
+
         
-        unirest.get(url)
-                .header("X-Mashape-Key", "9xDOL5oTurmshYJT2VeV7g7pxJ5kp1QNpa7jsn2vnL1Al6AcZJ")
-                .header("Accept", "application/json")
-                .end(function (result) {
-                    console.log(result.status, result.headers, result.body);
-                          
-                    var recipes = result.body;
-                    var id = 0;
-                                        
-                    if (result.body.length > 0) {
-                        id = recipes[0].id;
-
-                        var url = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/" + id + "/analyzedInstructions?stepBreakdown=true";
-                        unirest.get(url)
-                                .header("X-Mashape-Key", "9xDOL5oTurmshYJT2VeV7g7pxJ5kp1QNpa7jsn2vnL1Al6AcZJ")
-                                .header("Accept", "application/json")
-                                .end(function (result) {
-                                    console.log(result.status, result.headers, result.body);
-                                    if (result.body.length > 0) {
-                                        var instruction = result.body[0].steps;
-                                        var speechOutput = '';
-                                        var counter = 0;
-
-                                        for (var i = 0; i < instruction.length; i++) {
-                                            instructionSteps[i] = instruction[i].step;
-                                             for (var j = 0; j < instruction[i].ingredients.length; j++) {
-                                                 ingredientsArr[counter++] = instruction[i].ingredients[j].name;
-                                            } 
-                                        }
-                                        if (!currentStep) {
-                                            currentStep = 1;
-                                        }
-
-                                        current.emit('SayStep', currentStep);
-
-                                    } else {
-                                        current.emit(':ask', "I could not find the recipe.", "What else would you like to cook today?");
-                                    }
-                                });
-
-                    } else {
-                        current.emit(':ask', "Could not find the recipe.", "What else would you like to cook today?");
-                    }
-                });
     },
 
     'ModifyRecipe': function() {
@@ -265,22 +303,37 @@ var handlers = {
         var idx = ingredientsArr.indexOf(ing[0]);
         console.log(ing[0], ing[1], idx);
         console.log(ingredientsArr);
-        var modified = "{\"name\":\"\", \"steps\": ["; 
+        var modified = "{\"name\" : \"" + recipeName + "\", \"steps\": ["; 
+
         if (idx > -1) {
             var speechOutput = "";
             for (var i = 0; i < instructionSteps.length; i++) {
                 speechOutput += (" Step " + (i + 1) + ": " + instructionSteps[i].split(ing[0]).join(ing[1]) + ".");
-                modified += "{\"number\":" + (i + 1) + ", \"step\":" + instructionSteps[i].split(ing[0]).join(ing[1]) 
-                    + ", \"ingredients\":[], \"equipment\":[]},";
+                instructionSteps[i] = instructionSteps[i].split(ing[0]).join(ing[1]);
+                modified += "{\"number\":" +  (i + 1) + ", \"step\" : \""  + instructionSteps[i].split(ing[0]).join(ing[1]) + "\"}";
+                
+                if (i < instructionSteps.length-1) modified += ", ";
                 instructionSteps[i] = instructionSteps[i].split(ing[0]).join(ing[1]);
             }
-            modified = modified.substring(0, modified.length-1);
+            //modified = modified.substring(0, modified.length-1);
             modified = modified.replace("(PRINTABLE)", "");
             modified += "]}";
-            console.log(modified);
-            var json = JSON.stringify(eval("(" + modified + ")"));
+            console.log("Modified: " + modified);
+            ///var json = JSON.stringify(eval('(' + modified + ')'));
+            //console.log("JSONized: " + json);
             speechOutput = speechOutput.replace("(PRINTABLE)", "");
-            
+
+            console.log(instructionSteps);
+            var queryString = "INSERT INTO MODIFIED_RECIPES VALUES ('" + userid + "', '" + recipeName + "', '" + modified + "')" +
+            	"ON DUPLICATE KEY UPDATE modified_recipe = '" + modified + "'";
+            console.log(queryString);
+           connection.query(queryString, function(err, rows, fields) {
+		        if (err) {
+		            throw err;
+		        } else {
+	            	console.log("Successfully inserted modified recipe");
+            	}
+	        });
             current.emit('SayStep', 1);
         } else {
             current.emit(':tell', "The " + ing[0] + " does not exist in the recipe")
