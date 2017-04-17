@@ -20,6 +20,7 @@ var sqlinfo = {
                 database : 'cookformedb'
             }
 var connection;
+var tStep;
 
 exports.handler = function(event, context, callback) {
     var alexa = Alexa.handler(event, context);
@@ -382,10 +383,13 @@ var handlers = {
             	current.emit('GetFromDatabase');
             }
             saved = !saved;
+            tStep = currentStep;
+            currentStep = 0;
             current.emit(':ask', message);
         } else if(stepNumber > instructionSteps.length) {
         	var message = "This recipe for " + recipeName + " is finished, would you like to restart the recipe?";
         	currentStep = 0;
+        	tStep = currentStep;
         	var queryString = "INSERT INTO USER_HISTORY VALUES " + "(\'" + userid + "\', \'" + prevState + "\', \'" + recipeName + "\', " + currentStep + ")" +
         		" ON DUPLICATE KEY UPDATE intent =\'" + prevState + "\', recipe= \'" + recipeName + "\', stepNum = 0";
         	connection.query(queryString, function(err, rows, fields) {
@@ -403,6 +407,7 @@ var handlers = {
 
     'AMAZON.YesIntent': function() {
     	var current = this;
+    	currentStep = tStep;
     	if (prevState == 'GetInstructionStepByStep') {
     		currentStep += 1;
     		current.emit('SayStep', currentStep);
