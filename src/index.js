@@ -225,20 +225,21 @@ var handlers = {
 		            	if (jsonRecipe.steps.length > 0) {
 							var instruction = jsonRecipe.steps;
                             var speechOutput = '';
-                            var counter = 0;
                             console.log("iLength: " + instruction.length);
+                            console.log(JSON.stringify(jsonRecipe.ingredients[0]));
                             for (var i = 0; i < instruction.length; i++) {
                                 instructionSteps[i] = JSON.stringify(instruction[i].step);
-                                console.log("Step " + i + " :" + instructionSteps[i]);
-                                //  for (var j = 0; j < instruction[i].ingredients.length; j++) {
-                                //      ingredientsArr[counter++] = instruction[i].ingredients[j].name;
-                                // } 
+                                console.log("Step " + i + " :" + instructionSteps[i]);   
                             }
+                            for (var j = 0; j < jsonRecipe.ingredients.length; j++) {
+                                  ingredientsArr[j] = JSON.stringify(jsonRecipe.ingredients[j].ingredient);
+                             } 
                             if (!currentStep) {
                                 currentStep = 1;
                             }
 		            	}
 
+		            	console.log("ingredients: " + ingredientsArr);
 		            	current.emit('SayStep', currentStep);
 		            	//current.emit(':tell', "Recipe name:" + JSON.stringify(jsonRecipe.steps[0].step));
 		            } else {
@@ -300,12 +301,21 @@ var handlers = {
         var current = this;
         console.log(current.event.request.intent.slots.ingredients.value);
         var ing = current.event.request.intent.slots.ingredients.value.split(" to ");
-        var idx = ingredientsArr.indexOf(ing[0]);
+        var idx = false;//ingredientsArr.includes(ing[0]);
+        for (var i = 0; i < ingredientsArr.length; i++) {
+        	console.log("ingrd: " + ingredientsArr[i] + " = " + ing[0] + " " + (ingredientsArr[i] == ing[0]));
+        	if (ingredientsArr[i] == ing[0]) {
+        		idx = true;
+        	} else if (ingredientsArr[i].substring(1, ingredientsArr[i].length-1) == (ing[0])) {
+	        	idx = true;
+	        }
+        }
         console.log(ing[0], ing[1], idx);
+        console.log("Length: " + ingredientsArr.length + "  " + ingredientsArr[4]);
         console.log(ingredientsArr);
         var modified = "{\"name\" : \"" + recipeName + "\", \"steps\": ["; 
 
-        if (idx > -1) {
+        if (idx) {
             var speechOutput = "";
             for (var i = 0; i < instructionSteps.length; i++) {
                 speechOutput += (" Step " + (i + 1) + ": " + instructionSteps[i].split(ing[0]).join(ing[1]) + ".");
@@ -314,9 +324,26 @@ var handlers = {
                 
                 if (i < instructionSteps.length-1) modified += ", ";
                 instructionSteps[i] = instructionSteps[i].split(ing[0]).join(ing[1]);
+
             }
             //modified = modified.substring(0, modified.length-1);
+            modified += "], \"ingredients\": [";
+            var ingIncluded = false;
+            for ( var i = 0; i < ingredientsArr.length; i++) {
+            	if (ingredientsArr[i] == ing[1]) ingIncluded = true;
+            	modified += "{\"ingredient\": \"" + ingredientsArr[i] + "\"}";
+            	if (i < ingredientsArr.length-1) {
+            		modified += ","; 
+            	} else {
+            		if (!ingIncluded)
+            			modified += ", {\"ingredient\" : \"" + ing[1] + "\"}";
+            	}
+            }
+
             modified = modified.replace("(PRINTABLE)", "");
+            var rgx = /""/g;
+            modified = modified.replace(rgx, "\"");
+
             modified += "]}";
             console.log("Modified: " + modified);
             ///var json = JSON.stringify(eval('(' + modified + ')'));
