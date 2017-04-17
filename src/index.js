@@ -38,6 +38,7 @@ var handlers = {
 
     'Continue': function() {
         continued = true;
+        saved = false;
         this.emit('GetFromDatabase');
     },
 
@@ -67,6 +68,7 @@ var handlers = {
 	            prevState = rows[0].intent;
 	            recipeName = rows[0].recipe;
 	            currentStep = rows[0].stepNum;
+	            currentStep++;
         	}
 
             console.log("State: " + prevState + "name: " + recipeName + "currentStep: " + currentStep);
@@ -77,7 +79,8 @@ var handlers = {
 	                if (prevState == 'GetInstruction') {
 	                    current.emit('GetInstruction');
 	                } else if (prevState == 'GetInstructionStepByStep') {
-	                    current.emit('GetInstructionStepByStep');
+	                    //current.emit('GetInstructionStepByStep');
+	                    current.emit('SayStep', currentStep);
 	                } else {
 	                    current.emit(':tell', "failed");
 	                }
@@ -370,7 +373,7 @@ var handlers = {
     'SayStep': function(stepNumber) {
     	var current = this;
         userid = current.event.session.user.userId;
-        if (stepNumber < instructionSteps.length && stepNumber > 0) {
+        if (stepNumber <= instructionSteps.length && stepNumber > 0) {
             var message = "Step " + stepNumber + ": " + instructionSteps[stepNumber - 1] + ". ";
             message += "Would you like to continue?";
             //saveState();
@@ -380,7 +383,19 @@ var handlers = {
             }
             saved = !saved;
             current.emit(':ask', message);
-        } else {
+        } else if(stepNumber > instructionSteps.length) {
+        	var message = "This recipe for " + recipeName + " is finished, would you like to restart the recipe?";
+        	currentStep = 0;
+        	var queryString = "INSERT INTO USER_HISTORY VALUES " + "(\'" + userid + "\', \'" + prevState + "\', \'" + recipeName + "\', " + currentStep + ")" +
+        		" ON DUPLICATE KEY UPDATE intent =\'" + prevState + "\', recipe= \'" + recipeName + "\', stepNum = 0";
+        	connection.query(queryString, function(err, rows, fields) {
+	            if (err) {
+	                throw err;
+	            }
+	        });
+        	current.emit(':ask', message);
+        }
+        else {
         	console.log("Step Num: " + stepNumber + "   Steps Length: " + instructionSteps.Length);
         	current.emit(':tell', "Could not get this step.");
         }
