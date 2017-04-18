@@ -2,7 +2,7 @@
 var Alexa = require("alexa-sdk");
 var unirest = require("unirest");
 var mysql = require("mysql");
-var appId = 'amzn1.ask.skill.754eb63a-1172-440b-a711-8bd1a23d0c2f';
+var appId = 'amzn1.ask.skill.4233738b-7e2a-4fa6-888e-70c9fcd89686';
 
 var prevState = '';
 var instructionSteps = [];
@@ -369,6 +369,40 @@ var handlers = {
         } else {
             current.emit(':tell', "The " + ing[0] + " does not exist in the recipe")
         }
+    },
+
+    'Recommend': function() {
+
+        prevState = 'Recommend';
+
+        var current = this;
+
+        var ingredient = current.event.request.intent.slots.ingredients.value;
+
+        var url = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/random?limitLicense=false&number=5"
+        if (ingredient != undefined && ingredient.indexOf("vegetarian") != -1) {
+                url += "&tags=vegetarian";   
+            }  
+        }
+
+        unirest.get(url)
+                .header("X-Mashape-Key", "9xDOL5oTurmshYJT2VeV7g7pxJ5kp1QNpa7jsn2vnL1Al6AcZJ")
+                .header("Accept", "application/json")
+                .end(function (result) {
+                    
+                          
+                    var recommended = result.body.recipes;
+                    console.log(recommended[0]);
+                    
+                    var speechOutput = '';
+                    
+                    for (var i = 0; i < 5; i++) {
+                        speechOutput += (" Number " + (i + 1) + ": " + recommended[i].title + ".");
+                    }
+                    speechOutput = speechOutput.replace("&", "and");
+                    current.emit(':tell', speechOutput)
+
+                });
     },
 
     'SayStep': function(stepNumber) {
