@@ -417,7 +417,7 @@ var handlers = {
     },
 
     'AMAZON.NoIntent': function() {
-        this.emit('Stop');
+        this.emit('AMAZON.StopIntent');
     },
 
     'RepeatStep': function() {
