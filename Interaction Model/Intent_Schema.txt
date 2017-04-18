@@ -1,70 +1,70 @@
 {
-    "intents": [
+  "intents": [
+    {
+      "slots": [
         {
-            "intent": "Find",
-            "slots": [
-                {
-                    "name": "ingredients",
-                    "type": "INGREDIENT"
-                }
-            ]
-        },
-      	{
-          	"intent": "Continue"
-        },
-      	{
-          	"intent": "GetFromDatabase"
-        },
-        {
-            "intent": "Unhandled",
-            "slots": [
-                {
-                    "name": "ingredients",
-                    "type": "INGREDIENT"
-                }
-            ]
-        },
-        {
-            "intent": "GetInstruction",
-            "slots": [
-                {
-                    "name": "ingredients",
-                    "type": "INGREDIENT"
-                }
-            ]
-        },
-        {
-            "intent": "GetInstructionStepByStep",
-            "slots": [
-                {
-                    "name": "ingredients",
-                    "type": "INGREDIENT"
-                }
-            ]
-        },
-        {
-        	"intent": "ModifyRecipe",
-	    	"slots": [
-	        	{
-	        		"name": "ingredients",
-	        		"type": "INGREDIENT"
-	        	}
-	      	]
-	    },
-        {
-            "intent": "RepeatStep"
-        },
-        {
-            "intent": "AMAZON.StopIntent"
-        },
-        {
-            "intent": "AMAZON.HelpIntent"
-        },
-        {
-            "intent": "AMAZON.YesIntent"
-        },
-        {
-            "intent": "AMAZON.NoIntent"
+          "name": "ingredients",
+          "type": "INGREDIENT"
         }
-    ]
+      ],
+      "intent": "Find"
+    },
+    {
+      "intent": "Continue"
+    },
+    {
+      "slots": [
+        {
+          "name": "ingredients",
+          "type": "INGREDIENT"
+        }
+      ],
+      "intent": "ModifyRecipe"
+    },
+    {
+      "intent": "GetFromDatabase"
+    },
+    {
+      "slots": [
+        {
+          "name": "ingredients",
+          "type": "INGREDIENT"
+        }
+      ],
+      "intent": "Unhandled"
+    },
+    {
+      "slots": [
+        {
+          "name": "ingredients",
+          "type": "INGREDIENT"
+        }
+      ],
+      "intent": "GetInstruction"
+    },
+    {
+      "slots": [
+        {
+          "name": "ingredients",
+          "type": "INGREDIENT"
+        }
+      ],
+      "intent": "GetInstructionStepByStep"
+    },
+    {
+      "intent": "RepeatStep"
+    },
+    {
+      "intent": "AMAZON.StopIntent"
+    },
+    {
+      "intent": "AMAZON.HelpIntent"
+    },
+    {
+      "intent": "AMAZON.YesIntent"
+    },
+    {
+      "intent": "AMAZON.NoIntent"
+    }
+  ]
 }
