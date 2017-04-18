@@ -1,11 +1,11 @@
 Find find me recipes for {ingredients}
 Find find recipes for {ingredients}
-GetInstruction get me instructions for {ingredients}
-GetInstruction get instructions for {ingredients}
-GetInstruction find me instructions for {ingredients}
-GetInstructionStepByStep get me instructions step by step for {ingredients}
-RepeatStep repeat
-GetFromDatabase get from database
 Continue continue
 ModifyRecipe change {ingredients}
 Unhandled {ingredients}
+GetInstruction get me all instructions for {ingredients}
+GetInstructionStepByStep get instructions for {ingredients}
+GetInstructionStepByStep find me instructions for {ingredients}
+GetInstructionStepByStep get me instructions for {ingredients}
+GetInstructionStepByStep get me instructions step by step for {ingredients}
+RepeatStep repeat
