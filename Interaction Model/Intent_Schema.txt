@@ -13,15 +13,6 @@
       "intent": "Continue"
     },
     {
-      "slots": [
-        {
-          "name": "ingredients",
-          "type": "INGREDIENT"
-        }
-      ],
-      "intent": "ModifyRecipe"
-    },
-    {
       "intent": "GetFromDatabase"
     },
     {
@@ -50,6 +41,24 @@
         }
       ],
       "intent": "GetInstructionStepByStep"
+    },
+    {
+      "slots": [
+        {
+          "name": "ingredients",
+          "type": "INGREDIENT"
+        }
+      ],
+      "intent": "ModifyRecipe"
+    },
+    {
+      "slots": [
+        {
+          "name": "ingredients",
+          "type": "INGREDIENT"
+        }
+      ],
+      "intent": "Recommend"
     },
     {
       "intent": "RepeatStep"

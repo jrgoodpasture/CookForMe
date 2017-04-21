@@ -2,6 +2,7 @@ Find find me recipes for {ingredients}
 Find find recipes for {ingredients}
 Continue continue
 ModifyRecipe change {ingredients}
+Recommend recommend recipe
 Unhandled {ingredients}
 GetInstruction get me all instructions for {ingredients}
 GetInstructionStepByStep get instructions for {ingredients}
