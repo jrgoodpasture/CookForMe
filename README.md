@@ -11,15 +11,16 @@ Want a more concise, spread-out view? Try our Wiki Page.
 Lambda function needs 4.3 and above
 
 ## Node Dependencies
-mysql
-unirest
-alexa-sdk
+* mysql
+* unirest
+* alexa-sdk
 
 
 # Detailed Installation Guide
 
 ## Installing Node.js
 Node.js must be installed first for this project since we are using node modules.
+
 Install from [here](https://nodejs.org/en)
 
 ## Cloning Github Repository
@@ -31,6 +32,7 @@ Must use own application ID and copy it into index.js (can be found in AWS).
 
 ## Installing Node Modules
 Inside the /src directory, there is a file called package.json. This file contains all the dependencies for this project.
+
 Install them using command below inside the /src directory:
 ```
 npm install
@@ -39,16 +41,21 @@ This will create a /node_module directory inside /src for the dependencies
 
 ## AWS
 Amazon Web Services is required for this project. Create an account from [here](https://aws.amazon.com/).
+
 Getting started with Lambda functions can be found [here](http://docs.aws.amazon.com/lambda/latest/dg/getting-started.html).
 
 The command line interface is required to publish using the batch or shell script
+
 Install from [here](https://aws.amazon.com/cli/)
+
 Detailed guide to setting up is also provided in the link.
 
 Set up the lambda function in AWS and connect it with the [developer portal](developer.amazon.com).
 
 Copy and paste contents of Intent_Schema.txt into Intent Schema
+
 Copy and paste contents of INGREDIENT.txt into custom slot values and name the slot INGREDIENT
+
 Copy and paste contents of Sample_Utterances.txt into Sample Utterances
 
 ## Publishing
@@ -64,6 +71,7 @@ Must have AWS CLI setup and must edit script to publish to correct lambda functi
 
 ## Spoonacular API
 An account must be made from [here](https://market.mashape.com/spoonacular/recipe-food-nutrition).
+
 Currently, a username and password is provided.
 
 ## Database
