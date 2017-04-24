@@ -85,7 +85,7 @@ This project is using a mysql database in AWS. Creating a new database is possib
 * The goal of this project was to create a hands free cooking assistant in the kitchen using Amazon’s Alexa. The features for CookForMe include the ability to find and read out recipes, modify recipes, and recommend recipes. 
 
 ## How do I use it?
-Simply say “Alexa, CookForMe” to turn on the alexa skill. Say “help” to find the commands you can use or look at “What commands can I use?” question below.
+* Simply say “Alexa, CookForMe” to turn on the alexa skill. Say “help” to find the commands you can use or look at “What commands can I use?” question below.
 
 ## What commands can I use?
 * Find me recipe for .. “recipe”: CookForMe will search the recipe and return top 5 recipes from Spoonacular API.
