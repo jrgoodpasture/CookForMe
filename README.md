@@ -44,12 +44,14 @@ Amazon Web Services is required for this project. Create an account from [here](
 
 Getting started with Lambda functions can be found [here](http://docs.aws.amazon.com/lambda/latest/dg/getting-started.html).
 
+### CLI
 The command line interface is required to publish using the batch or shell script
 
 Install from [here](https://aws.amazon.com/cli/)
 
 Detailed guide to setting up is also provided in the link.
 
+### Developer Portal
 Set up the lambda function in AWS and connect it with the [developer portal](developer.amazon.com).
 
 Copy and paste contents of Intent_Schema.txt into Intent Schema
