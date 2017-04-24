@@ -5,7 +5,7 @@ Amazon Alexa Skill for our Junior Design Project to aid in cooking
 Min Jung, Min Ho Lee, Jacob Goodpasture, Rohan Avalani, Seth Davis
 
 ## Try our Wiki Page
-Want a more concise, spread-out view? Try our Wiki Page.
+Want a more concise, spread-out view? Try our [Wiki](https://github.com/jrgoodpasture/CookForMe/wiki) Page.
 
 ## Node Version
 Lambda function needs 4.3 and above
