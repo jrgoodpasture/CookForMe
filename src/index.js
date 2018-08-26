@@ -15,7 +15,7 @@ var userid = '';
 var sqlinfo = {
                 host     : 'cookformedb.ci5n0kf1z0rv.us-east-1.rds.amazonaws.com',
                 user     : 'cookforme',
-                password : 'Soundify2017',
+                password : '',
                 port     : '3306',
                 database : 'cookformedb'
             }
